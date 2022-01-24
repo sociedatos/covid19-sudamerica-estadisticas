@@ -1,0 +1,14 @@
+beautifulsoup4
+lxml
+requests
+requests[socks]
+unidecode
+numpy
+numexpr
+bottleneck
+pandas
+html5lib
+pantab
+hist
+aghast
+git+https://github.com/sociedatos/perkins@main#perkins
