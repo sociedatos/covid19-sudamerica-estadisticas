@@ -6,6 +6,7 @@ unidecode
 numpy
 numexpr
 bottleneck
+matplotlib
 pandas
 html5lib
 pantab
