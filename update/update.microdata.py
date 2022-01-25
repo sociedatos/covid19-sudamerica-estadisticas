@@ -76,12 +76,16 @@ def get_iso3166(adm1_df, iso):
         ~country_geo_names.index.duplicated(keep='first')
     ]
 
-    adm1_index = country_geo_names.loc[adm1_index]
+    adm1_index = country_geo_names.reindex(adm1_index)
 
     adm1_index['name'] = iso_geo_names.loc[
         adm1_index['geocode'].values
     ][0].values
     adm1_index.index = adm1_df
+
+    if adm1_index.isna().any():
+        print('ADM1 names not matched: ')
+        print(adm1_index[adm1_index.isna()])
 
     return adm1_index
 
@@ -116,6 +120,8 @@ def storage_format(df, iso_code, has_iso_name=True):
     if has_iso_name:
         adm1_df = get_iso3166(df['adm1_isocode'].unique(), iso_code)
         df['adm1_isocode'] = df['adm1_isocode'].map(adm1_df['geocode'].to_dict())
+
+        df = df[~df['adm1_isocode'].isna()]
 
     df = df.set_index(
         fields + ['iso_code'] + BASE_COLUMNS
