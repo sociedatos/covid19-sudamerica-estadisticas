@@ -78,14 +78,14 @@ def get_iso3166(adm1_df, iso):
 
     adm1_index = country_geo_names.reindex(adm1_index)
 
-    adm1_index['name'] = iso_geo_names.loc[
-        adm1_index['geocode'].values
-    ][0].values
-    adm1_index.index = adm1_df
-
-    if adm1_index.isna().any():
+    if adm1_index.isna()['geocode'].any():
         print('ADM1 names not matched: ')
         print(adm1_index[adm1_index.isna()])
+
+    adm1_index['name'] = iso_geo_names.reindex(
+        adm1_index['geocode'].values
+    )[0].values
+    adm1_index.index = adm1_df
 
     return adm1_index
 
