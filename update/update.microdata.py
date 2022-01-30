@@ -78,9 +78,9 @@ def get_iso3166(adm1_df, iso):
 
     adm1_index = country_geo_names.reindex(adm1_index)
 
-    if adm1_index.isna()['geocode'].any():
+    if adm1_index['geocode'].isna().any():
         print('ADM1 names not matched: ')
-        print(adm1_index[adm1_index.isna()])
+        print(adm1_index['geocode'][adm1_index['geocode'].isna()])
 
     adm1_index['name'] = iso_geo_names.reindex(
         adm1_index['geocode'].values
@@ -297,8 +297,9 @@ def update_peru():
     peru_deaths_df = download_peru(PERU_DEATHS_URL, encoding='utf-8')
     peru_deaths_df = peru_deaths_df.sort_values('fecha_fallecimiento')
     peru_deaths_df = peru_deaths_df.rename(columns={
-        'edad_declarada': 'edad'
-    })
+        'edad_declarada': 'edad',
+        'uuid': 'id_persona'
+    }, errors='ignore')
 
     histo_age_df = get_age_multi_histo(
         peru_deaths_df,
@@ -645,7 +646,7 @@ def update_paraguay():
 BRASIL_BASE_URL = 'https://opendatasus.saude.gov.br/dataset/'
 BRASIL_SRAG_URLS = [
     # BRASIL_BASE_URL + 'bd-srag-2020',
-    BRASIL_BASE_URL + 'bd-srag-2021',
+    BRASIL_BASE_URL + 'bd-srag-2021-e-2022',
 ]
 
 BRASIL_COL = [
