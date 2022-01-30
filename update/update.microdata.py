@@ -646,7 +646,7 @@ def update_paraguay():
 BRASIL_BASE_URL = 'https://opendatasus.saude.gov.br/dataset/'
 BRASIL_SRAG_URLS = [
     # BRASIL_BASE_URL + 'bd-srag-2020',
-    BRASIL_BASE_URL + 'bd-srag-2021-e-2022',
+    BRASIL_BASE_URL + 'srag-2021-e-2022',
 ]
 
 BRASIL_COL = [
@@ -939,7 +939,7 @@ def do_merge(result_dict):
         base_df.columns = base_df.columns.astype(int)
 
         df = df.xs(
-            slice(pd.to_datetime('2021-01-04'), None),
+            slice(pd.to_datetime('2021-07-04'), None),
             level='date',
             drop_level=False
         )
