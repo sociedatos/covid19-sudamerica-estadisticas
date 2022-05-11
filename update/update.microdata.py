@@ -233,10 +233,10 @@ def get_latest_revision(URL):
     return cdata[-1]['url']
 
 
-PERU_BASE_URL = 'https://cloud.minsa.gob.pe/s'
-PERU_CASES_URL = PERU_BASE_URL + '/AC2adyLkHCKjmfm/download'
-PERU_DEATHS_URL = PERU_BASE_URL + '/xJ2LQ3QyRW38Pe5/download'
-PERU_HOSPITALIZATIONS_URL = PERU_BASE_URL + '/BosSrQ5wDf86xxg/download'
+PERU_BASE_URL = 'https://files.minsa.gob.pe/s'
+PERU_CASES_URL = PERU_BASE_URL + '/eRqxR35ZCxrzNgr/download'
+PERU_DEATHS_URL = PERU_BASE_URL + '/t9AFqRbXw3F55Ho/download'
+PERU_HOSPITALIZATIONS_URL = 'https://cloud.minsa.gob.pe/s/BosSrQ5wDf86xxg/download'
 PERU_API_URL = 'https://www.datosabiertos.gob.pe/api/3'
 PERU_TEST_BASE_URL = PERU_API_URL + '/action/package_show?id=a884fefb-7dd6-483e-9ca1-88589659f175'
 
