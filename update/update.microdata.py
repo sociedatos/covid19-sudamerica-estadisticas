@@ -599,7 +599,7 @@ def format_df_py(df):
     return df
 
 
-PARAGUAY_URL = 'https://public.tableau.com/workbooks/COVID19PY-Registros.twbx'
+PARAGUAY_URL = 'https://public.tableau.com/workbooks/6COVIDDatosDescarga-TBPublic-Descarga.twbx'
 
 GROUPER_PY = [
     pd.Grouper(key='departamento'),
