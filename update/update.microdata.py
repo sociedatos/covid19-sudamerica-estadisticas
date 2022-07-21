@@ -445,7 +445,8 @@ def update_colombia():
 # Argentina
 
 
-ARGENTINA_URL = 'https://sisa.msal.gov.ar/datos/descargas/covid-19/files/Covid19Casos.zip'
+ARGENTINA_BASE = 'https://sisa.msal.gov.ar/datos/descargas/covid-19/files'
+ARGENTINA_URL = ARGENTINA_BASE + '/Covid19Casos.zip'
 def do_download_argentina():
     cdata = requests.get(ARGENTINA_URL, headers=perkins.DEFAULT_HEADERS, timeout=30)
     zipfile = ZipFile(io.BytesIO(cdata.content))
@@ -520,7 +521,7 @@ def download_argentina(_retry=0):
     return argentina_df
 
 
-def update_argentina():
+def update_argentina_old():
     argentina_df = download_argentina()
 
     histo_age_df = get_age_multi_histo(
@@ -562,6 +563,110 @@ def update_argentina():
     )
 
     return {'histo_age': histo_age_df, 'histo_diff': histo_diff_df}
+
+CASE_STATE_AR = {
+    'fis': 'symptom_onset',
+    'fecha_apertura': 'confirmed',
+    'fecha_internacion': 'hospitalized',
+    'fecha_cui_intensivos': 'intensive_care',
+    'fecha_fallecimiento': 'dead',
+}
+ARGENTINA_CASES = ARGENTINA_BASE + '/Confirmados_Ambulatorios.zip'
+ARGENTINA_HOSPITALIZED = ARGENTINA_BASE + '/Covid19_Internados_y_Fallecidos.zip'
+def update_argentina():
+    argentina_df = pd.concat([
+        pd.read_csv(ARGENTINA_CASES),
+        pd.read_csv(ARGENTINA_HOSPITALIZED),
+    ])
+
+    argentina_df.columns = argentina_df.columns.str.lower()
+    argentina_df = argentina_df.reset_index(drop=True)
+
+    # Remove duplicate ids by amount of data
+    ar_duplicates = argentina_df[
+        argentina_df['ideventocaso'].duplicated(keep=False)
+    ].sort_values('ideventocaso')
+
+    ar_duplicates = ar_duplicates.iloc[:, 8:].T.isna().sum().groupby(
+        ar_duplicates['ideventocaso']
+    ).apply(lambda _: _.sort_values().iloc[1:])
+
+    argentina_df = argentina_df[
+        ~argentina_df.index.isin(ar_duplicates.reset_index().iloc[:, 1].values)
+    ]
+
+    # Format data
+
+    for date_column in CASE_STATE_AR.keys():
+        argentina_df[date_column] = pd.to_datetime(
+            argentina_df[date_column], errors='coerce'
+        )
+
+    argentina_df = argentina_df[
+        argentina_df['clasificacion_algoritmo'].str.contains('COV').fillna(False)
+    ]
+
+    argentina_df['edad_diagnostico'] = argentina_df[
+        'edad_diagnostico'
+    ].fillna(-1).astype(int)
+    argentina_df = argentina_df.rename(
+        columns={
+            'edad_diagnostico': 'edad',
+            'provincia_carga': 'carga_provincia_nombre'
+        }
+    )
+
+    argentina_df['sexo'] = 'U'
+
+    # Create Age Histograms
+
+    histo_age_df = get_age_multi_histo(
+        argentina_df, 'AR', [('fecha_apertura', 'tested')], GROUPER_AR
+    )
+
+    argentina_df = argentina_df[
+        ~argentina_df['clasificacion_algoritmo'].isin([
+            'Estudiados por pruebas moleculares sin resultados positivos',
+            'SARS COV-2 Negativo por test de antígeno'
+        ])
+    ]
+    argentina_df = argentina_df.drop(
+        columns=['clasificacion_algoritmo', 'evento']
+    )
+
+    histo_age_df = get_age_multi_histo(
+        argentina_df,
+        'AR',
+        [*CASE_STATE_AR.items()],
+        GROUPER_AR,
+        histo_age_df
+    )
+
+    update_since = pd.to_datetime('2022/06/06')
+    histo_age_df = histo_age_df.xs(
+        slice(update_since, None),
+        level='date',
+        drop_level=False
+    )
+
+    # Create diff histograms
+
+    CASE_KEYS = list(CASE_STATE_AR.keys())
+    CASE_INTERVALS = list(zip(CASE_KEYS[:-1], CASE_KEYS[1:]))
+    CASE_INTERVALS.append(('fecha_apertura', 'fecha_fallecimiento'))
+
+    histo_diff_df = get_diff_multi_histo(
+        argentina_df, 'AR', CASE_INTERVALS, CASE_STATE_AR, GROUPER_AR
+    )
+
+    histo_diff_df = histo_diff_df.xs(
+        slice(update_since, None),
+        level='date',
+        drop_level=False
+    )
+
+    return {'histo_age': histo_age_df, 'histo_diff': histo_diff_df}
+
 
 
 # Paraguay
