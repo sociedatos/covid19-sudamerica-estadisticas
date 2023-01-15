@@ -695,7 +695,9 @@ def format_df_py(df):
     df = df.set_index('id').sort_index()
 
     df['sexo'] = df['sexo'].replace({'MASCULINO': 'M', 'FEMENINO': 'F'})
+
     df[df['edad'] > 900] = np.nan
+    df[df['edad'].apply(type) == pd._libs.missing.NAType] = np.nan #?
 
     df['departamento'] = df['departamento'].str.lower().replace({
         'pte. hayes': 'presidente hayes'
