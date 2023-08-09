@@ -706,7 +706,7 @@ def format_df_py(df):
     return df
 
 
-PARAGUAY_URL = 'https://public.tableau.com/workbooks/6COVIDDatosDescarga-TBPublic-Descarga.twbx'
+PARAGUAY_URL = 'https://public.tableau.com/workbooks/COVID19PY-Registros.twb'
 
 GROUPER_PY = [
     pd.Grouper(key='departamento'),
@@ -753,7 +753,7 @@ def update_paraguay():
 BRASIL_BASE_URL = 'https://opendatasus.saude.gov.br/dataset/'
 BRASIL_SRAG_URLS = [
     # BRASIL_BASE_URL + 'bd-srag-2020',
-    BRASIL_BASE_URL + 'srag-2021-e-2022',
+    BRASIL_BASE_URL + 'srag-2021-a-2023',
 ]
 
 BRASIL_COL = [
@@ -828,6 +828,7 @@ def update_brazil_srag():
 
             del(dataset_df)
 
+    brasil_srag_df.to_csv('/tmp/qwe.csv')
     brasil_srag_df = brasil_srag_df.sort_values('dt_notific')
 
     # clean duplicate indexes
